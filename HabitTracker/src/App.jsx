@@ -72,37 +72,60 @@ function App() {
   // Step 1: I need array of habits.
   return (
     <>
-      <div className="app-title">
-        <h1>Habit Tracker</h1>
-      </div>
-      <div className="habit-form">
-        <input
-          type="text"
-          placeholder="Enter a habit"
-          value={habit}
-          onChange={(e) => setHabit(e.target.value)}
-        />
-        <button onClick={() => addHabit()}>+</button>
-      </div>
-      <br />
-      <div className="habit-display">
-        {habits.map((habit, index) => (
-          <div key={index}>
-            <h2>{habit.name} - {habit.xp} </h2>
-            <h2>Streak: {habit.streak}</h2>
-            <h3>LastCompleted: {habit.lastCompleted ? new Date(habit.lastCompleted).toDateString() : 'Not completed yet'}</h3>
-            <button onClick={() => completeHabit(index)}>
-              Completed +10
+      <div className='app'>
+        <div className='container'>
+          <h1 className="app-title">Habit Tracker</h1>
+
+          <div className="habit-form">
+            <input
+              type="text"
+              placeholder="Enter a habit"
+              value={habit}
+              onChange={(e) => setHabit(e.target.value)}
+            />
+            <button onClick={() => addHabit()}>+</button>
+          </div>
+
+          <div className='summary-card'>
+            <h2> Total XP: {habits.reduce((total, habit) => total + habit.xp, 0)}</h2>
+            <button className="clear-btn"
+              onClick={() => clearLocalStorage()}>
+              Clear All
             </button>
           </div>
-        ))}
-      </div>
-      <div className='display-xp'>
-        <h2> Total XP: {habits.reduce((total, habit) => total + habit.xp, 0)}</h2>
-      </div>
 
-      <div className='clear-local-storage'>
-        <button onClick={() => clearLocalStorage()}> Clear Local Storage</button>
+          <div className="habit-list">
+            {habits.map((habit, index) => {
+              const completedToday =
+                habit.lastCompleted &&
+                new Date(habit.lastCompleted).toDateString() === new Date().toDateString();
+
+              return (
+                <div className="habit-card" key={index}>
+                  <div className="habit-card-top">
+                    <h2>{habit.name}</h2>
+                    {completedToday && <span className="done-badge">Done Today</span>}
+                  </div>
+                  <p><strong>XP:</strong> {habit.xp}</p>
+                  <p><strong>Streak:</strong> 🔥 {habit.streak}</p>
+                  <p>
+                    <strong>Last Completed:</strong>{" "}
+                    {habit.lastCompleted
+                      ? new Date(habit.lastCompleted).toDateString()
+                      : "Not completed yet"}
+                  </p>
+                  <button
+                    className='complete-btn'
+                    onClick={() => completeHabit(index)}>
+                    Completed +10
+                  </button>
+                </div>
+              );
+
+            })}
+          </div>
+
+        </div>
       </div>
     </>
   )

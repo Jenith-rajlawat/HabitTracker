@@ -1,0 +1,175 @@
+* {
+    box-sizing: border-box;
+    /* If you set box-sizing: border-box;
+        on an element,
+        the padding and border are included in the calculation of the width and height: */
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #f3f4f6;
+    font-family: Arial, sans-serif;
+    color: #1f2937;
+}
+
+.app {
+    min-height: 100vh;
+    padding: 40px 16px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    /* The CSS property margin: 0 auto;
+        is a common shorthand used to horizontally center a block-level element within its parent container */
+}
+
+.app-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 24px;
+}
+
+.habit-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.habit-form input {
+    flex: 1;
+    /* flex: 1 is a shorthand property that tells a flex item to grow and fill the available space in its container */
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    /* outline: none (or outline: 0) removes the default visual border that browsers draw around interactive elements—like buttons, links, and inputs—when they are focused */
+}
+
+.habit-form input:focus {
+    border-color: #3b82f6;
+}
+
+.habit-form button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.habit-form button:hover {
+    opacity: 0.9;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.clear-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+}
+
+.clear-btn:hover {
+    opacity: 0.9;
+}
+
+.habit-list {
+    display: grid;
+    gap: 18px;
+}
+
+.habit-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.habit-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.habit-card h2 {
+    font-size: 1.4rem;
+}
+
+.habit-card p {
+    margin-bottom: 8px;
+    line-height: 1.5;
+    /* Adds space between text lines to prevent crowding,
+        crucial for long text blocks. */
+}
+
+.complete-btn {
+    margin-top: 12px;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.complete-btn:hover {
+    opacity: 0.9;
+}
+
+.done-badge {
+    background: #dcfce7;
+    color: #166534;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+@media (max-width: 600px) {
+
+    /* The @media (max-width: 600px) rule applies CSS styles specifically to devices with a screen width of 600 pixels or less,
+        making it a fundamental tool for creating mobile-responsive websites */
+    .habit-form {
+        flex-direction: column;
+        /* Changing normal row flow to column style ui for mobile */
+    }
+
+    .habit-form button {
+        width: 100%
+            /* Taking full space for the width of button  */
+    }
+
+    .summary-card {
+        flex-direction: column;
+        align-items: flex-start;
+        /* Stacking elements vertically and aligning them to the start of the container */
+    }
+
+    .habit-card-top {
+        flex-direction: column;
+        align-items: flex-start;
+        /* Stacking elements vertically and aligning them to the start of the container */
+    }
+}
