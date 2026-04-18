@@ -147,6 +147,25 @@ body {
     font-weight: bold;
 }
 
+.delete-btn {
+    margin-top: 10px;
+    margin-left: 10px;
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.empty-state {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
 @media (max-width: 600px) {
 
     /* The @media (max-width: 600px) rule applies CSS styles specifically to devices with a screen width of 600 pixels or less,

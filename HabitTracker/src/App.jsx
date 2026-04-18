@@ -69,6 +69,13 @@ function App() {
     setHabits([]); // clear the habits state as well to reflect the change in the UI
   }
 
+
+  const deleteHabit = (index) => {
+    const updatedHabits = habits.filter((_, i) => i !== index);
+    setHabits(updatedHabits);
+    localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Update localStorage after deletion
+  }
+
   // Step 1: I need array of habits.
   return (
     <>
@@ -95,6 +102,11 @@ function App() {
           </div>
 
           <div className="habit-list">
+            {habits.length === 0 && (
+              <div className="empty-state">
+                <p>No habits yet. Add your first one.</p>
+              </div>
+            )}
             {habits.map((habit, index) => {
               const completedToday =
                 habit.lastCompleted &&
@@ -114,10 +126,15 @@ function App() {
                       ? new Date(habit.lastCompleted).toDateString()
                       : "Not completed yet"}
                   </p>
+
                   <button
                     className='complete-btn'
                     onClick={() => completeHabit(index)}>
                     Completed +10
+                  </button>
+
+                  <button className="delete-btn" onClick={() => deleteHabit(index)}>
+                    Delete
                   </button>
                 </div>
               );
