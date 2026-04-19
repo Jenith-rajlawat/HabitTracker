@@ -11,21 +11,29 @@ function App() {
   useEffect(() => {
     const storedHabits = localStorage.getItem('habits')
     if (storedHabits) {
-      const parsedHabits = JSON.parse(storedHabits)
+      const parsedHabits = JSON.parse(storedHabits) //parsing the string data back to JavaScript object/array
       setHabits(parsedHabits)
     }
   }, []) // [] means this effect runs only once when the component mounts
 
   //save
   useEffect(() => {
-    if (habits.length === 0) return;
+    if (habits.length === 0) return; // this is done to prevent saving an empty array to localStorage when the component first mounts and habits is initialized as an empty array. Without this check, the useEffect would run on the initial render and overwrite any existing habits in localStorage with an empty array. By adding this condition, we ensure that we only save to localStorage when there are actually habits to save, thus preserving any previously stored habits until the user decides to clear them or add new ones.
     const stringifiedHabits = JSON.stringify(habits)
     localStorage.setItem('habits', stringifiedHabits)
-  }, [habits]) // [habits] means this effect runs every time the habits state changes
+  }, [habits]) // [habits] means this effect runs every time the habits state changes even when mounting for the first time but we have a check to prevent saving an empty array to localStorage on the initial render
 
   const addHabit = () => {
+    // Empty input check
     if (!habit.trim()) return
 
+    // Duplicate habit check
+    if (habits.some(h => h.name.toLowerCase() === habit.trim().toLowerCase())) {
+      alert('Habit already exists! Please enter a different habit.');
+      return;
+    }
+
+    // Gate keeping the inputs to prevent empty or duplicate habits(Defensive programming) 
     const mappedHabit = {
       name: habit,
       xp: 0,
@@ -39,6 +47,15 @@ function App() {
   const completeHabit = (index) => {
     const updatedHabits = [...habits]
     const lastCompletedDate = updatedHabits[index].lastCompleted ? new Date(updatedHabits[index].lastCompleted).toDateString() : null;
+
+
+    //Same day completion check - the latest date is provided by Date().toDateString().
+    if (lastCompletedDate === new Date().toDateString()) {
+      {
+        alert('You have already completed this habit today! Come back tomorrow to earn more XP and maitain your streak!');
+        return;
+      }
+    }
     if (updatedHabits[index].lastCompleted) {
       const today = new Date();
       const yesterday = new Date();
@@ -65,6 +82,8 @@ function App() {
   }
 
   const clearLocalStorage = () => {
+    const confirmClear = confirm('Are you sure you want to clear all habits? This action cannot be undone.');
+    if (!confirmClear) return; // If the user cancels the action, we exit the function without clearing the habits.
     localStorage.removeItem('habits');
     setHabits([]); // clear the habits state as well to reflect the change in the UI
   }
@@ -89,6 +108,11 @@ function App() {
               placeholder="Enter a habit"
               value={habit}
               onChange={(e) => setHabit(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  addHabit();
+                }
+              }}
             />
             <button onClick={() => addHabit()}>+</button>
           </div>
@@ -117,6 +141,7 @@ function App() {
                   <div className="habit-card-top">
                     <h2>{habit.name}</h2>
                     {completedToday && <span className="done-badge">Done Today</span>}
+                    {/* UX Thinking to show crucial information on action - Don't just change data communicate with the user */}
                   </div>
                   <p><strong>XP:</strong> {habit.xp}</p>
                   <p><strong>Streak:</strong> 🔥 {habit.streak}</p>
