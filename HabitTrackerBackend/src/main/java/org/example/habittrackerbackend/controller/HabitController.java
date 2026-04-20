@@ -9,8 +9,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/habits")
-@CrossOrigin(origins = "*")
-//@CrossOrigin(origins = "http://localhost:5173")
+//@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 public class HabitController {
 
     private List<Habit> habits = new ArrayList<>();
