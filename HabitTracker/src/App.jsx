@@ -9,12 +9,38 @@ function App() {
 
   //load
   useEffect(() => {
-    const storedHabits = localStorage.getItem('habits')
-    if (storedHabits) {
-      const parsedHabits = JSON.parse(storedHabits) //parsing the string data back to JavaScript object/array
-      setHabits(parsedHabits)
+    // const storedHabits = localStorage.getItem('habits')
+    // fetch('http://localhost:8080/api/habits')
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     console.log('Fetched data:', data);
+    //     setHabits(data)
+    //   })
+    //   .catch(error => console.error('Error fetching habits:', error));
+
+    const loadHabits = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/habits');
+        console.log('Fetch response:', response);
+        console.log('Fetch response status:', response.status);
+        console.log('Fetch response headers:', response.headers);
+        const data = await response.json();
+        console.log('Fetch response json ', data);
+        setHabits(data);
+      } catch (error) {
+        console.error('Error fetching habits:', error);
+      }
     }
+    loadHabits();
+    // const parsedHabits = JSON.parse(storedHabits) //parsing the string data back to JavaScript object/array
+
   }, []) // [] means this effect runs only once when the component mounts
+
+  // addHabit() → POST
+  // completeHabit() → PUT
+  // deleteHabit() → DELETE
+
+  //  Save only when user performs an action, rather then using useEffect to save on every change in habits state, we can directly call the save function inside the addHabit, completeHabit and deleteHabit functions after updating the habits state. This way, we ensure that we are saving to localStorage only when there is an actual change made by the user, rather than on every render or state change which might not always be triggered by user actions. This approach can help optimize performance and reduce unnecessary writes to localStorage.
 
   //save
   useEffect(() => {
@@ -23,7 +49,7 @@ function App() {
     localStorage.setItem('habits', stringifiedHabits)
   }, [habits]) // [habits] means this effect runs every time the habits state changes even when mounting for the first time but we have a check to prevent saving an empty array to localStorage on the initial render
 
-  const addHabit = () => {
+  const addHabit = async () => {
     // Empty input check
     if (!habit.trim()) return
 
@@ -32,53 +58,82 @@ function App() {
       alert('Habit already exists! Please enter a different habit.');
       return;
     }
+    try {
+      const postedHabit = await fetch('http://localhost:8080/api/habits', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: habit //only send name and backend fill rest to their initial values
+        })
 
-    // Gate keeping the inputs to prevent empty or duplicate habits(Defensive programming) 
-    const mappedHabit = {
-      name: habit,
-      xp: 0,
-      streak: 0,
-      lastCompleted: null
+      })
+      const mappedHabit = await postedHabit.json();
+      // Gate keeping the inputs to prevent empty or duplicate habits(Defensive programming) 
+      // const mappedHabit = {
+      //   name: habit,
+      //   xp: 0,
+      //   streak: 0,
+      //   lastCompleted: null
+      // }
+      setHabits([...habits, mappedHabit])
+      setHabit('') // Clearing the container carrying habit from input field after adding the habit to the habits array
+    } catch (error) {
+      console.error('Error adding habit:', error);
     }
-    setHabits([...habits, mappedHabit])
-    setHabit('') // Clearing the container carrying habit from input field after adding the habit to the habits array
+
   }
 
-  const completeHabit = (index) => {
-    const updatedHabits = [...habits]
-    const lastCompletedDate = updatedHabits[index].lastCompleted ? new Date(updatedHabits[index].lastCompleted).toDateString() : null;
+  // const completeHabit = (index) => {
+  //   const updatedHabits = [...habits]
+  //   const lastCompletedDate = updatedHabits[index].lastCompleted ? new Date(updatedHabits[index].lastCompleted).toDateString() : null;
 
 
-    //Same day completion check - the latest date is provided by Date().toDateString().
-    if (lastCompletedDate === new Date().toDateString()) {
-      {
-        alert('You have already completed this habit today! Come back tomorrow to earn more XP and maitain your streak!');
-        return;
-      }
-    }
-    if (updatedHabits[index].lastCompleted) {
-      const today = new Date();
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const streakMaintained = updatedHabits[index].lastCompleted ? new Date(updatedHabits[index].lastCompleted).toDateString() === yesterday.toDateString() : false;
-      const isSameDay = lastCompletedDate === today.toDateString();
-      // updatedHabits[index].streak = isSameDay ? updatedHabits[index].streak : updatedHabits[index].streak + 1;
-      if (!isSameDay) {
-        updatedHabits[index].streak = streakMaintained ? updatedHabits[index].streak + 1 : 1;
-      }
-      updatedHabits[index].xp = isSameDay ? updatedHabits[index].xp : updatedHabits[index].xp + 10;
-    }
-    else {
-      updatedHabits[index].xp += 10;
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const streakMaintained = updatedHabits[index].lastCompleted ? new Date(updatedHabits[index].lastCompleted).toDateString() === yesterday.toDateString() : false;
-      updatedHabits[index].streak = streakMaintained ? updatedHabits[index].streak + 1 : 1;
-    }
-    updatedHabits[index].lastCompleted = new Date();
+  //   //Same day completion check - the latest date is provided by Date().toDateString().
+  //   if (lastCompletedDate === new Date().toDateString()) {
+  //     {
+  //       alert('You have already completed this habit today! Come back tomorrow to earn more XP and maitain your streak!');
+  //       return;
+  //     }
+  //   }
+  //   if (updatedHabits[index].lastCompleted) {
+  //     const today = new Date();
+  //     const yesterday = new Date();
+  //     yesterday.setDate(yesterday.getDate() - 1);
+  //     const streakMaintained = updatedHabits[index].lastCompleted ? new Date(updatedHabits[index].lastCompleted).toDateString() === yesterday.toDateString() : false;
+  //     const isSameDay = lastCompletedDate === today.toDateString();
+  //     // updatedHabits[index].streak = isSameDay ? updatedHabits[index].streak : updatedHabits[index].streak + 1;
+  //     if (!isSameDay) {
+  //       updatedHabits[index].streak = streakMaintained ? updatedHabits[index].streak + 1 : 1;
+  //     }
+  //     updatedHabits[index].xp = isSameDay ? updatedHabits[index].xp : updatedHabits[index].xp + 10;
+  //   }
+  //   else {
+  //     updatedHabits[index].xp += 10;
+  //     const yesterday = new Date();
+  //     yesterday.setDate(yesterday.getDate() - 1);
+  //     const streakMaintained = updatedHabits[index].lastCompleted ? new Date(updatedHabits[index].lastCompleted).toDateString() === yesterday.toDateString() : false;
+  //     updatedHabits[index].streak = streakMaintained ? updatedHabits[index].streak + 1 : 1;
+  //   }
+  //   updatedHabits[index].lastCompleted = new Date();
 
-    // A big no :  comparing Date objects instead of strings
-    setHabits(updatedHabits)
+  //   // A big no :  comparing Date objects instead of strings
+  //   setHabits(updatedHabits)
+  // }
+
+  const completeHabit = async (id) => {
+    debugger;
+    try {
+      const response = await fetch(`http://localhost:8080/api/habits/${id}/complete`, {
+        method: 'PUT'
+      })
+      const updatedHabit = await response.json();
+      const updatedHabits = habits.map(habit => habit.id === id ? updatedHabit : habit);
+      setHabits(updatedHabits);
+    } catch (error) {
+      console.error('Error completing habit:', error);
+    }
   }
 
   const clearLocalStorage = () => {
