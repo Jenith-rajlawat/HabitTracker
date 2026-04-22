@@ -11,27 +11,54 @@ public class Habit {
     private int streak;
     private LocalDate lastCompleted;
 
-    public Habit() {}
+    public Habit() {
+    }
 
-    public Habit(Long id, String name, int xp, int streak, LocalDate lastCompleted){
+    public Habit(Long id, String name, int xp, int streak, LocalDate lastCompleted) {
         this.id = id;
-        this.name= name;
+        this.name = name;
         this.xp = xp;
         this.streak = streak;
         this.lastCompleted = lastCompleted;
     }
 
-    public Long getId() {return id;}
-    public void setId(Long id){this.id = id;}
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public Long getId() {
+        return id;
+    }
 
-    public int getXp() { return xp; }
-    public void setXp(int xp) { this.xp = xp; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public int getStreak() { return streak; }
-    public void setStreak(int streak) { this.streak = streak; }
+    public String getName() {
+        return name;
+    }
 
-    public LocalDate getLastCompleted() { return lastCompleted; }
-    public void setLastCompleted(LocalDate lastCompleted) { this.lastCompleted = lastCompleted; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void setXp(int xp) {
+        this.xp = xp;
+    }
+
+    public int getStreak() {
+        return streak;
+    }
+
+    public void setStreak(int streak) {
+        this.streak = streak;
+    }
+
+    public LocalDate getLastCompleted() {
+        return lastCompleted;
+    }
+
+    public void setLastCompleted(LocalDate lastCompleted) {
+        this.lastCompleted = lastCompleted;
+    }
 }
