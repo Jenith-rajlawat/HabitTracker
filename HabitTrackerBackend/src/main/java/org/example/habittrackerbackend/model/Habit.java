@@ -12,7 +12,7 @@ public class Habit {
     private LocalDate lastCompleted;
 
     public Habit() {
-    }
+    } //default constructor
 
     public Habit(Long id, String name, int xp, int streak, LocalDate lastCompleted) {
         this.id = id;
@@ -20,8 +20,9 @@ public class Habit {
         this.xp = xp;
         this.streak = streak;
         this.lastCompleted = lastCompleted;
-    }
+    } //parameterized constructor
 
+    //getters and setters
     public Long getId() {
         return id;
     }
