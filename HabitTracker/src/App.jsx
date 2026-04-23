@@ -4,8 +4,8 @@ import { useEffect } from 'react'
 import './App.css'
 
 function App() {
-  const [habit, setHabit] = useState('')
-  const [habits, setHabits] = useState([])
+  const [habit, setHabit] = useState('') //single habit from the input field initialized as an empty string
+  const [habits, setHabits] = useState([]) // array of habits initialized as an empty array, each habit will be an object with properties like name, xp, streak, lastCompleted etc. which will be filled when the user adds a habit and interacts with it.
 
   //load
   useEffect(() => {
