@@ -144,10 +144,21 @@ function App() {
   }
 
 
-  const deleteHabit = (index) => {
-    const updatedHabits = habits.filter((_, i) => i !== index);
-    setHabits(updatedHabits);
-    localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Update localStorage after deletion
+  const deleteHabit = async (id) => {
+    // const updatedHabits = habits.filter(habit => habit.id !== id);
+    try {
+      const respone = await fetch(`http://localhost:8080/api/habits/${id}/delete`, {
+        method: 'DELETE'
+      })
+      if (!respone.ok) {
+        throw new Error(`Failed to delete habit with id ${id}. Status: ${respone.status}`);
+      }
+      const updatedHabits = habits.filter(habit => habit.id !== id);
+      setHabits(updatedHabits);
+      localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Update localStorage after deletion
+    } catch (error) {
+      throw new Error('Error deleting habit:', error);
+    }
   }
 
   // Step 1: I need array of habits.
@@ -186,13 +197,13 @@ function App() {
                 <p>No habits yet. Add your first one.</p>
               </div>
             )}
-            {habits.map((habit, index) => {
+            {habits.map((habit) => {
               const completedToday =
                 habit.lastCompleted &&
                 new Date(habit.lastCompleted).toDateString() === new Date().toDateString();
 
               return (
-                <div className="habit-card" key={index}>
+                <div className="habit-card" key={habit.id}>
                   <div className="habit-card-top">
                     <h2>{habit.name}</h2>
                     {completedToday && <span className="done-badge">Done Today</span>}
@@ -209,11 +220,11 @@ function App() {
 
                   <button
                     className='complete-btn'
-                    onClick={() => completeHabit(index)}>
+                    onClick={() => completeHabit(habit.id)}>
                     Completed +10
                   </button>
 
-                  <button className="delete-btn" onClick={() => deleteHabit(index)}>
+                  <button className="delete-btn" onClick={() => deleteHabit(habit.id)}>
                     Delete
                   </button>
                 </div>

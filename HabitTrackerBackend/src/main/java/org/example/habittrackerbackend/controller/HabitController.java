@@ -2,6 +2,7 @@ package org.example.habittrackerbackend.controller;
 // org-> example-> habittrackerbackend-> controller folder structure where package name should be lowercase
 
 import org.example.habittrackerbackend.model.Habit;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -40,7 +41,8 @@ public class HabitController {
     @PutMapping("/{id}/complete")
     public Habit completeHabit(@PathVariable int id) {
         for (Habit habit : habits) {
-            if (habit.getId().equals(id)) {
+//            The equals() method of Long expects another Long. getId is Long and id is int so if both has 1 equals will return false
+            if (habit.getId().equals(Long.valueOf(id))) {
                 LocalDate today = LocalDate.now();
 
                 //same day --> do nothing
@@ -63,5 +65,15 @@ public class HabitController {
 
         }
         throw new RuntimeException("Habit not found with id: " + id);
+    }
+
+    @DeleteMapping("/{id}/delete")
+    public ResponseEntity<Void> deleteHabit(@PathVariable int id){
+        Boolean isDeleted = habits.removeIf(habit -> habit.getId() == id);
+
+        if(!isDeleted){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.noContent().build();
     }
 }
