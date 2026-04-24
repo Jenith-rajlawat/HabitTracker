@@ -2,6 +2,7 @@ package org.example.habittrackerbackend.controller;
 // org-> example-> habittrackerbackend-> controller folder structure where package name should be lowercase
 
 import org.example.habittrackerbackend.model.Habit;
+import org.example.habittrackerbackend.repository.HabitRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,13 +18,19 @@ import java.util.List;
 // Giving cross origin url access to this Controller to request anything CORS using CrossOrigin which takes in origins as a param
 public class HabitController {
 
-    private List<Habit> habits = new ArrayList<>(); // list of habits where we keep on adding habits or updating or deleting from it. For that session till we store it to db this holds the source of truth
+//    private List<Habit> habits = new ArrayList<>(); // list of habits where we keep on adding habits or updating or deleting from it. For that session till we store it to db this holds the source of truth
+    private final HabitRepository habitRepository;
+    public HabitController(HabitRepository habitRepository){
+        this.habitRepository = habitRepository;
+    }
     private Long idCounter = 1L; // counter of id starting from 1
 
     @GetMapping
     //just returning the list of habits if any. For first load it would just be [] and no url given to @GetMapping is like api/habits being the triggering url for it
     public List<Habit> getHabits() {
-        return habits;
+
+//        return habits;
+        return habitRepository.findAll();
     }
 
     @PostMapping
@@ -34,15 +41,18 @@ public class HabitController {
         habit.setStreak(0);
         habit.setLastCompleted(null);
 //        Modifying the same habit and adding to the list using add method and returning it to frontend so it can also display the details in its list of habits after adding
-        habits.add(habit);
-        return habit;
+//        habits.add(habit);
+        return habitRepository.save(habit);
+//        return habit;
     }
 
     @PutMapping("/{id}/complete")
-    public Habit completeHabit(@PathVariable int id) {
-        for (Habit habit : habits) {
+    public Habit completeHabit(@PathVariable Long id) {
+//        for (Habit habit : habits) {
 //            The equals() method of Long expects another Long. getId is Long and id is int so if both has 1 equals will return false
-            if (habit.getId().equals(Long.valueOf(id))) {
+//            if (habit.getId().equals(Long.valueOf(id))) {
+                Habit habit = habitRepository.findById(id)
+                        .orElseThrow(() ->  new RuntimeException("Habit not found"));
                 LocalDate today = LocalDate.now();
 
                 //same day --> do nothing
@@ -60,20 +70,23 @@ public class HabitController {
 
                 habit.setXp(habit.getXp() + 10);
                 habit.setLastCompleted(today);
-                return habit;
-            }
+//                return habit;
+        return habitRepository.save(habit);
+//            }
 
-        }
-        throw new RuntimeException("Habit not found with id: " + id);
+//        }
+//        throw new RuntimeException("Habit not found with id: " + id);
     }
 
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<Void> deleteHabit(@PathVariable int id){
-        Boolean isDeleted = habits.removeIf(habit -> habit.getId() == id);
+    public void deleteHabit(@PathVariable Long id){
+//        Boolean isDeleted = habits.removeIf(habit -> habit.getId() == id);
 
-        if(!isDeleted){
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.noContent().build();
+//        if(!isDeleted){
+//            return ResponseEntity.notFound().build();
+//        }
+//        return ResponseEntity.noContent().build();
+
+        habitRepository.deleteById(id);
     }
 }
