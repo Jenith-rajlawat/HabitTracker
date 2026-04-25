@@ -2,11 +2,13 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import { useEffect } from 'react'
 import './App.css'
+import { getHabits, addHabit as addHabitApi, completeHabit as completeHabitApi, deleteHabit as deleteHabitApi } from './api/HabitApi'
 
 function App() {
   const [habit, setHabit] = useState('') //single habit from the input field initialized as an empty string
   const [habits, setHabits] = useState([]) // array of habits initialized as an empty array, each habit will be an object with properties like name, xp, streak, lastCompleted etc. which will be filled when the user adds a habit and interacts with it.
-
+  const [loading, setLoading] = useState(true); // loading state to show a loading indicator while fetching habits from the API
+  const [error, setError] = useState(null); // error state to handle and display any errors that occur during API calls
   //load
   useEffect(() => {
     // const storedHabits = localStorage.getItem('habits')
@@ -20,15 +22,13 @@ function App() {
 
     const loadHabits = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/habits');
-        console.log('Fetch response:', response);
-        console.log('Fetch response status:', response.status);
-        console.log('Fetch response headers:', response.headers);
-        const data = await response.json();
-        console.log('Fetch response json ', data);
-        setHabits(data);
+        const response = await getHabits();
+        setHabits(response);
       } catch (error) {
         console.error('Error fetching habits:', error);
+        setError('Failed to fetch habits.');
+      } finally {
+        setLoading(false);
       }
     }
     loadHabits();
@@ -59,17 +59,7 @@ function App() {
       return;
     }
     try {
-      const postedHabit = await fetch('http://localhost:8080/api/habits', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: habit //only send name and backend fill rest to their initial values
-        })
-
-      })
-      const mappedHabit = await postedHabit.json();
+      const postedHabit = await addHabitApi(habit.trim());
       // Gate keeping the inputs to prevent empty or duplicate habits(Defensive programming) 
       // const mappedHabit = {
       //   name: habit,
@@ -77,10 +67,12 @@ function App() {
       //   streak: 0,
       //   lastCompleted: null
       // }
-      setHabits([...habits, mappedHabit])
+      setHabits([...habits, postedHabit])
       setHabit('') // Clearing the container carrying habit from input field after adding the habit to the habits array
     } catch (error) {
       console.error('Error adding habit:', error);
+      alert('Failed to add habit.');
+      setError('Failed to add habit.'); // Set the error state to display an error message in the UI if needed
     }
 
   }
@@ -123,16 +115,14 @@ function App() {
   // }
 
   const completeHabit = async (id) => {
-    debugger;
     try {
-      const response = await fetch(`http://localhost:8080/api/habits/${id}/complete`, {
-        method: 'PUT'
-      })
-      const updatedHabit = await response.json();
-      const updatedHabits = habits.map(habit => habit.id === id ? updatedHabit : habit);
+      const response = await completeHabitApi(id);
+      const updatedHabits = habits.map(habit => habit.id === id ? response : habit);
       setHabits(updatedHabits);
     } catch (error) {
       console.error('Error completing habit:', error);
+      alert('Failed to complete habit.');
+      setError('Failed to complete habit.');
     }
   }
 
@@ -147,17 +137,14 @@ function App() {
   const deleteHabit = async (id) => {
     // const updatedHabits = habits.filter(habit => habit.id !== id);
     try {
-      const respone = await fetch(`http://localhost:8080/api/habits/${id}/delete`, {
-        method: 'DELETE'
-      })
-      if (!respone.ok) {
-        throw new Error(`Failed to delete habit with id ${id}. Status: ${respone.status}`);
-      }
+      const response = await deleteHabitApi(id); //20% important concept: Component handler and API function should not have the same name
       const updatedHabits = habits.filter(habit => habit.id !== id);
       setHabits(updatedHabits);
       localStorage.setItem('habits', JSON.stringify(updatedHabits)); // Update localStorage after deletion
     } catch (error) {
-      throw new Error('Error deleting habit:', error);
+      console.error('Error deleting habit:', error);
+      alert('Failed to delete habit.');
+      setError('Failed to delete habit.');
     }
   }
 
@@ -192,7 +179,10 @@ function App() {
           </div>
 
           <div className="habit-list">
-            {habits.length === 0 && (
+            {error && <div className="error">{error}</div>}
+            {loading ? (
+              <div className="loading">Loading habits...</div>
+            ) : habits.length === 0 && (
               <div className="empty-state">
                 <p>No habits yet. Add your first one.</p>
               </div>
@@ -220,8 +210,10 @@ function App() {
 
                   <button
                     className='complete-btn'
-                    onClick={() => completeHabit(habit.id)}>
-                    Completed +10
+                    onClick={() => completeHabit(habit.id)}
+                    disabled={completedToday}
+                  >
+                    {completedToday ? "Completed" : "Mark as Completed"}
                   </button>
 
                   <button className="delete-btn" onClick={() => deleteHabit(habit.id)}>

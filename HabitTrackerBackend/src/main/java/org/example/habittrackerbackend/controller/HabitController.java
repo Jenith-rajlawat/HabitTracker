@@ -79,7 +79,7 @@ public class HabitController {
     }
 
     @DeleteMapping("/{id}/delete")
-    public void deleteHabit(@PathVariable Long id){
+    public ResponseEntity<Void> deleteHabit(@PathVariable Long id){
 //        Boolean isDeleted = habits.removeIf(habit -> habit.getId() == id);
 
 //        if(!isDeleted){
@@ -87,6 +87,10 @@ public class HabitController {
 //        }
 //        return ResponseEntity.noContent().build();
 
+        if (!habitRepository.existsById(id)) {
+            return ResponseEntity.notFound().build(); // 404
+        }
         habitRepository.deleteById(id);
+        return ResponseEntity.noContent().build(); //204
     }
 }
