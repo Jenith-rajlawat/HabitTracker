@@ -172,10 +172,10 @@ function App() {
 
           <div className='summary-card'>
             <h2> Total XP: {habits.reduce((total, habit) => total + habit.xp, 0)}</h2>
-            <button className="clear-btn"
+            {/* <button className="clear-btn"
               onClick={() => clearLocalStorage()}>
               Clear All
-            </button>
+            </button> */}
           </div>
 
           <div className="habit-list">
