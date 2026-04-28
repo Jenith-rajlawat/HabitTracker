@@ -38,4 +38,5 @@ build/
 .DS_Store
 
 #ApplicaitonProperties ##
-src/main/resources/application.properties
+#src/main/resources/application.properties
+#This is commented to deploy with environment variables set to both render and locally on edit configuration while adding the applicaiton of backend
