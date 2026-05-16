@@ -37,9 +37,6 @@ build/
 ### Mac OS ###
 .DS_Store
 
-### env file ignored ###
-.env
-
 #ApplicaitonProperties ##
 #src/main/resources/application.properties
 #This is commented to deploy with environment variables set to both render and locally on edit configuration while adding the applicaiton of backend
